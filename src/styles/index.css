@@ -10,3 +10,10 @@
     import 'relative/path/to/stylesheet.scss';
 
 */
+li ,input[type='text']{
+    font-size: 20px;;
+}
+.active{
+    background-color: aliceblue !important;
+    color: black !important;
+}
