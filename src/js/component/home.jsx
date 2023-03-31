@@ -7,6 +7,99 @@ const Home = () => {
   const [inputTask, setTask] = useState("");
   const [listtodo, setlisttodo] = useState([]);
   const [hover, setHover] = useState();
+  const [userActive, setUserActive] = useState(false);
+
+	useEffect(() => {
+		user();
+		if(!userActive) {
+		  newUser();           
+		}
+		else{
+		  getTodo();
+		}
+		}, [!userActive]);
+	
+		const newUser = () => {
+			fetch("https://assets.breatheco.de/apis/fake/todos/user/rcv", {
+				method: "POST",
+				body: JSON.stringify([]),
+				headers: {"Content-Type": "application/json"}
+			})
+			.then(resp => {
+			  console.log("Response newUser ok", resp.ok);
+			  console.log("Response newUser status", resp.status); 
+			})
+			.then(data => {
+				console.log("newUser data", data);
+      })
+    }
+
+		const user = () => {
+			fetch('https://assets.breatheco.de/apis/fake/todos/user', {
+				method: "GET",    
+			})
+			.then(resp => {
+				console.log("Response User ok", resp.ok);
+				console.log("Response User status", resp.status); 	
+				return resp.json() 
+      })	
+			.then(data => {		      
+				console.log("user data", data);
+				setUserActive(data.includes("rcv"));
+				console.log("setUserActive status", data.includes("rcv") );               		
+			})
+		}
+
+    const getTodo = () => {
+			fetch('https://assets.breatheco.de/apis/fake/todos/user/rcv', {
+				method: "GET",      
+			})
+			.then(resp => {
+			  console.log("Response getTodo ok", resp.ok); 
+			  console.log("Response getTodo status", resp.status); 
+			  return resp.json(); 
+			})
+			.then(data => {
+			   setlisttodo(data.map(e => e.label))    
+			},[])
+		}  
+				
+		const newTodo = () => {      
+			fetch('https://assets.breatheco.de/apis/fake/todos/user/rcv', {
+				method: "PUT",
+				body: JSON.stringify(tarea),
+				headers: {"Content-Type": "application/json"}
+			})
+			.then(resp => {
+			  console.log("Response newTodo ok", resp.ok); 
+			  console.log("Response newTodo status", resp.status); 
+			  return resp.json(); 
+			})
+			.then(data => {
+			  console.log("newTodo data", data);        
+			  console.log("Tareas:", tarea);
+			})
+    }				
+				
+		const deleteAll = () => {
+      fetch('https://assets.breatheco.de/apis/fake/todos/user/rcv', {
+			method: "DELETE",
+			body: JSON.stringify([tarea]),
+			headers: {"Content-Type": "application/json"}
+			})
+			.then(resp => {
+			  console.log("Response deleteAll ok", resp.ok);
+			  console.log("Response deleteAll status", resp.status); 
+			  return resp.json(); 
+			})
+			.then(data => {
+			  console.log("deleteAll data", data); 
+			  if (data.result == "ok"){
+					setlisttodo([]);
+					setUserActive(false);
+			  }      
+			})
+    }
 
   const handleChange = (e) => {
     setTask(e.target.value);
