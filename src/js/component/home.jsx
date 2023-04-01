@@ -64,10 +64,20 @@ const Home = () => {
 			}, [])
 	}
 
-	const newTodo = () => {
+	const newTodo = (listtodo,inputTask) => {
+		let objlist = [];
+		listtodo.map((task) => {
+			objlist.push({
+				label: task,
+				done: false
+			});
+		});
+		typeof inputTask !== 'undefined' ? objlist.push({label: inputTask,done: false}) : null;
+		console.log("Esto estoy enviando");
+		console.log(JSON.stringify(objlist));
 		fetch('https://assets.breatheco.de/apis/fake/todos/user/rcv', {
 			method: "PUT",
-			body: JSON.stringify(tarea),
+			body: JSON.stringify(objlist),
 			headers: { "Content-Type": "application/json" }
 		})
 			.then(resp => {
@@ -77,14 +87,15 @@ const Home = () => {
 			})
 			.then(data => {
 				console.log("newTodo data", data);
-				console.log("Tareas:", tarea);
+				console.log("Tareas:", objlist);
 			})
+			.catch(error => {
+				console.log(error);}); 
 	}
 
 	const deleteAll = () => {
 		fetch('https://assets.breatheco.de/apis/fake/todos/user/rcv', {
 			method: "DELETE",
-			body: JSON.stringify([tarea]),
 			headers: { "Content-Type": "application/json" }
 		})
 			.then(resp => {
@@ -106,12 +117,18 @@ const Home = () => {
 	};
 
 	const enter = (e) => {
-		e.key == "Enter" ? setlisttodo(listtodo.concat(inputTask)) : null;
+		//e.key == "Enter" ? setlisttodo(listtodo.concat(inputTask))  : null;
+		if(e.key==="Enter"){
+			setlisttodo(listtodo.concat(inputTask))
+			newTodo(listtodo,inputTask);
+		}
 	};
 
 	const deleteItem = (index) => {
 		console.log("borrando", index);
+		newTodo(listtodo.filter((task, currentIndex) => index != currentIndex));
 		setlisttodo(listtodo.filter((task, currentIndex) => index != currentIndex));
+
 	};
 
 	return (
@@ -152,8 +169,9 @@ const Home = () => {
 					<li className="list-group-item">Nothing To Do</li>
 				)}
 			</ul>
-			<div className="d-flex justify-content-start">
-				Number of Tasks: {listtodo.length}
+			<div className="d-flex justify-content-between">
+				<p>Number of Tasks: {listtodo.length}</p>
+				<button className="btn btn-danger mt-2" onClick={deleteAll}>delete all</button>
 			</div>
 		</div>
 	);
